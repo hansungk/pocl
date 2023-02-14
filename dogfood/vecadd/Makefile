@@ -19,7 +19,7 @@ SRCS = main.cc
 all: $(PROJECT).dump $(PROJECT).elf
 
 lib$(PROJECT).a: kernel.cl
-	POCL_DEBUG=all POCL_DEBUG_LLVM_PASSES=1 LD_LIBRARY_PATH=$(RISCV_GNU_TOOLS_PATH)/lib:$(POCL_CC_PATH)/lib $(POCL_CC_PATH)/bin/poclcc -o lib$(PROJECT).a kernel.cl
+	POCL_DEBUG=all POCL_DEBUG_LLVM_PASSES=1 LD_LIBRARY_PATH=$(LLVM_PREFIX)/lib:$(RISCV_GNU_TOOLS_PATH)/lib:$(POCL_CC_PATH)/lib $(POCL_CC_PATH)/bin/poclcc -o lib$(PROJECT).a kernel.cl
 
 $(PROJECT).elf: $(SRCS) lib$(PROJECT).a
 	$(CXX) $(CXXFLAGS) $(SRCS) $(LIBS) -o $(PROJECT).elf
