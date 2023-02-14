@@ -22,11 +22,16 @@
 
 ## Building LLVM for RiscV
 
+# NOTE(hansung): might have to be -b vortex or -b vortex-gfx
 - git clone -b release/10.x https://github.com/vortexgpgpu/llvm.git llvm
 - cd llvm
 - mkdir build
 - cd build
 - export LLVM_VORTEX=/opt/llvm-vortex
+# NOTE(hansung): use system cmake (/usr/bin/cmake), otherwise cmake complains
+# something about llvm-ranlib missing. Also use
+# -LLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi;libunwind" instead of separate
+# LLVM_ENABLE_RUNTIMES.
 - cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_ABI_BREAKING_CHECKS=FORCE_OFF -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF -DBUILD_SHARED_LIBS=True -DCMAKE_INSTALL_PREFIX=$LLVM_VORTEX -DLLVM_BUILD_TESTS=False -DDEFAULT_SYSROOT=$RISCV_TOOLCHAIN_PATH/riscv32-unknown-elf -DLLVM_DEFAULT_TARGET_TRIPLE="riscv32-unknown-elf" -DLLVM_TARGETS_TO_BUILD="RISCV" ../llvm
 #- cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_ABI_BREAKING_CHECKS=FORCE_OFF -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF -DBUILD_SHARED_LIBS=True -DCMAKE_INSTALL_PREFIX=$LLVM_VORTEX -DLLVM_BUILD_TESTS=False -DDEFAULT_SYSROOT=$RISCV_TOOLCHAIN_PATH/riscv32-unknown-elf -DLLVM_DEFAULT_TARGET_TRIPLE="riscv32-unknown-elf" -DLLVM_TARGETS_TO_BUILD="RISCV" ../llvm
 - cmake --build . --target install
@@ -59,6 +64,8 @@
 - export POCL_CC_PATH=/opt/pocl/compiler
 - cmake -G Ninja -DCMAKE_INSTALL_PREFIX=$POCL_CC_PATH -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=ON -DWITH_LLVM_CONFIG=$LLVM_VORTEX/bin/llvm-config -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF ..
 - cmake --build . --target install
+# NOTE(hansung): what I used:
+# cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/scratch/hansung/build/pocl-vortex/compiler -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=ON -DWITH_LLVM_CONFIG=/scratch/hansung/build/vortex-toolchain-prebuilt/llvm-riscv/bin/llvm-config -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF ..
 
 - mkdir build_rt
 - cd build_rt
