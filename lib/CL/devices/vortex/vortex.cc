@@ -579,8 +579,10 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
       if ((meta->arg_info[i].type == POCL_ARG_TYPE_POINTER)
        || (meta->arg_info[i].type == POCL_ARG_TYPE_IMAGE)
        || (meta->arg_info[i].type == POCL_ARG_TYPE_SAMPLER)) {
+        printf("%s: pointer/image/sampler\n", __func__);
         abuf_size += 4;
-      } else {
+      } else { // NOTE(hansung): POCL_ARG_TYPE_NONE
+        printf("%s: none\n", __func__);
         abuf_size += al->size;
       }
     }
@@ -599,6 +601,9 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
 
     // write context data
     {
+      // NOTE(hansung): the kernel_context_t struct has to have identical fields
+      // to the context struct in Vortex runtime: `struct context_t` in
+      // runtime/include/vx_spawn.h
       kernel_context_t ctx;
       for (int i = 0; i < 3; ++i) {
         ctx.num_groups[i] = pc->num_groups[i];
@@ -653,7 +658,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
       } else 
       if (meta->arg_info[i].type == POCL_ARG_TYPE_SAMPLER) {
         std::abort();
-      } else {
+      } else { // NOTE(hansung): POCL_ARG_TYPE_NONE
         memcpy(abuf_ptr + addr, &args_addr, 4);
         memcpy(abuf_ptr + (args_addr - args_base_addr), al->value, al->size);
         print_data("*** arg-addr=", abuf_ptr + addr, 4);
