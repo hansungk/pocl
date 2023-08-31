@@ -65,7 +65,7 @@
 - cmake -G Ninja -DCMAKE_INSTALL_PREFIX=$POCL_CC_PATH -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=ON -DWITH_LLVM_CONFIG=$LLVM_VORTEX/bin/llvm-config -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF ..
 - cmake --build . --target install
 # NOTE(hansung): what I used:
-# cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/scratch/hansung/build/pocl-vortex/compiler -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=ON -DWITH_LLVM_CONFIG=/scratch/hansung/build/vortex-toolchain-prebuilt/llvm-riscv/bin/llvm-config -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF ..
+# cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/scratch/hansung/build/pocl-vortex-$(git rev-parse --short HEAD)/compiler -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=ON -DWITH_LLVM_CONFIG=/scratch/hansung/build/vortex-toolchain-prebuilt/llvm-riscv/bin/llvm-config -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=On ..
 
 - mkdir build_rt
 - cd build_rt
@@ -74,3 +74,5 @@
 - export VORTEX_DRIVER_LIB=~/dev/vortex_live/driver/stub/libvortex.so
 - cmake -G Ninja -DHOST_DEVICE_BUILD_HASH=riscv32-unknown-unknown-elf -DCMAKE_INSTALL_PREFIX=$POCL_RT_PATH -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=OFF -DVORTEX_DRIVER_INC=$VORTEX_DRIVER_INC -DVORTEX_DRIVER_LIB=$VORTEX_DRIVER_LIB -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF ..
 - cmake --build . --target install
+# NOTE(hansung): what I used:
+# cmake -G Ninja -DHOST_DEVICE_BUILD_HASH=riscv32-unknown-unknown-elf -DCMAKE_INSTALL_PREFIX=/scratch/hansung/build/pocl-vortex-$(git rev-parse --short HEAD)/runtime -DCMAKE_BUILD_TYPE=Debug -DOCS_AVAILABLE=OFF -DVORTEX_DRIVER_INC=/scratch/hansung/src/vortex/driver/include -DVORTEX_DRIVER_LIB=/scratch/hansung/src/vortex/driver/stub/libvortex.so -DENABLE_VORTEX=ON -DBUILD_TESTS=OFF -DPOCL_DEBUG_MESSAGES=ON -DENABLE_ICD=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=On ..
