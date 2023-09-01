@@ -159,6 +159,7 @@ poclu_read_binfile (const char *filename, size_t *len)
 
   fseek (file, 0, SEEK_SET);
   fread (src, *len, 1, file);
+  src[*len] = '\0';
   fclose (file);
 
   return src;
