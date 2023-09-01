@@ -539,10 +539,10 @@ void pocl_vortex_read(void *data,
 }
 
 static void print_data(const char* text, const uint8_t* data, size_t size) {
-  /*printf(text);
+  printf(text);
   for (size_t i = 0; i < size; ++i)
     printf("%02x", data[size-1-i]);
-  printf("\n");*/
+  printf("\n");
 }
 
 void pocl_vortex_run(void *data, _cl_command_node *cmd) {
@@ -588,6 +588,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
     }
   }
   assert(abuf_size <= 0xffff);
+  printf("calculated argument buffer size: abuf_size=%lu bytes\n", abuf_size);
 
   // allocate kernel arguments buffer
   vx_buffer_h staging_buf;
@@ -596,6 +597,8 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
 
   // update kernel arguments buffer
   {
+    // NOTE(hansung): abuf_ptr is pointer to host memory.  This will later by
+    // cudaMemcpy'd to device memory
     auto abuf_ptr = (uint8_t*)vx_host_ptr(staging_buf);
     assert(abuf_ptr);
 
@@ -668,6 +671,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
     }
 
     // upload kernel arguments buffer
+    // NOTE(hansung): staging_buf: host --> args_base_addr: device
     err = vx_copy_to_dev(staging_buf, args_base_addr, abuf_size, 0);
     assert(0 == err);
 
