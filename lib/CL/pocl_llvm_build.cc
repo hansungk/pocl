@@ -128,7 +128,8 @@ unlink_source(FrontendOptions &fe)
 
   FrontendInputFile const& file = fe.Inputs.front();
   if (file.isFile() && !file.isSystem()) {
-    return pocl_remove(file.getFile().str().c_str());
+    // return pocl_remove(file.getFile().str().c_str());
+    return 0;
   } else {
     return 0; // nothing to do
   }
@@ -536,7 +537,7 @@ int pocl_llvm_build_program(cl_program program,
     pocl_read_file(tempfile, &PreprocessedOut, &PreprocessedSize);
   }
   /* always remove preprocessed output - the sources are in different files */
-  pocl_remove(tempfile);
+  // pocl_remove(tempfile);
 
   if (pocl_get_bool_option("POCL_LEAVE_KERNEL_COMPILER_TEMP_FILES", 0) == 0) {
     if (num_input_headers > 0)
