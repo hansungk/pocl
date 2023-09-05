@@ -597,7 +597,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
 
   // update kernel arguments buffer
   {
-    // NOTE(hansung): abuf_ptr is pointer to host memory.  This will later by
+    // NOTE(hansung): abuf_ptr is host memory.  This will later by
     // cudaMemcpy'd to device memory
     auto abuf_ptr = (uint8_t*)vx_host_ptr(staging_buf);
     assert(abuf_ptr);
@@ -605,8 +605,10 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
     // write context data
     {
       // NOTE(hansung): the kernel_context_t struct has to have identical fields
-      // to the context struct in Vortex runtime: `struct context_t` in
-      // runtime/include/vx_spawn.h
+      // as the `struct context_t` struct in Vortex runtime
+      // (runtime/include/vx_spawn.h)
+      // Here, we translate POCL's context data into something that the Vortex
+      // program can understand.
       kernel_context_t ctx;
       for (int i = 0; i < 3; ++i) {
         ctx.num_groups[i] = pc->num_groups[i];
@@ -625,6 +627,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
 
     // write arguments    
     uint32_t args_base_addr = KERNEL_ARG_BASE_ADDR;
+    // NOTE(hansung): what is abuf_args_size??
     uint32_t args_addr = args_base_addr + ALIGNED_CTX_SIZE + abuf_args_size;
     uint32_t args_ext_addr = (args_base_addr + abuf_size) - abuf_ext_size;
     for (i = 0; i < meta->num_args; ++i) {
@@ -643,6 +646,9 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
         }
       } else
       if (meta->arg_info[i].type == POCL_ARG_TYPE_POINTER) {
+        // NOTE(hansung): First, store the value of the pointer, i.e. where in
+        // the device memory to actually find the addresses (?)
+        // NOTE(hansung): why are we storing thes double-pointers?
         memcpy(abuf_ptr + addr, &args_addr, 4);        
         if (al->value == NULL) {
           memset(abuf_ptr + (args_addr - args_base_addr), 0, 4);
@@ -651,6 +657,8 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
           cl_mem m = (*(cl_mem *)(al->value));
           auto buf_data = (vx_buffer_data_t*)m->device_ptrs[cmd->device->dev_id].mem_ptr;
           auto dev_mem_addr = buf_data->dev_mem_addr + al->offset;
+          // NOTE(hansung): Then, store the dereferenced value of the pointer,
+          // i.e. where in the heap the buffer lives
           memcpy(abuf_ptr + (args_addr - args_base_addr), &dev_mem_addr, 4);
           print_data("*** ptr=", abuf_ptr + (args_addr - args_base_addr), 4);
         }
@@ -671,8 +679,9 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
     }
 
     // upload kernel arguments buffer
-    // NOTE(hansung): staging_buf: host --> args_base_addr: device
+    // NOTE(hansung): staging_buf: host --> args_base_addr (0x7fff0000): device
     err = vx_copy_to_dev(staging_buf, args_base_addr, abuf_size, 0);
+    // NOTE(hansung): intercept argument buffer and write into a separate file as well
     assert(0 == err);
 
     // release staging buffer

@@ -392,6 +392,8 @@ main(int argc, char **argv)
       exit(1);
     }
 
+  // NOTE(hansung): this is where we copy the program binary into a file by
+  // using clGetProgramInfo.  See http://portablecl.org/docs/html/pocl_binary.html.
   CHECK_CL_ERROR(clGetProgramInfo(program, CL_PROGRAM_BINARIES,
                                   sizeof(unsigned char*), &binary, NULL));
 
