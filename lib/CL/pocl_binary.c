@@ -658,6 +658,9 @@ pocl_binary_serialize(cl_program program, unsigned device_i, size_t *size)
     POCL_MSG_PRINT_INFO ("serializing kernel binary: %s\n", program_bin_path);
     buffer = serialize_file (program_bin_path, basedir_len, buffer);
   }
+  POCL_MSG_PRINT_INFO(
+      "%s: after serializing kernel binary (%u kernels): size=%lu\n", __func__,
+      num_kernels, buffer - start);
 #else
   char program_bc_path[POCL_FILENAME_LENGTH];
   pocl_cache_program_bc_path(program_bc_path, program, device_i);
@@ -671,6 +674,9 @@ pocl_binary_serialize(cl_program program, unsigned device_i, size_t *size)
                  (program, &program->kernel_meta[i], device_i, buffer);
       assert(buffer <= end_of_buffer);
     }
+    POCL_MSG_PRINT_INFO(
+        "%s: after serializing kernel meta (%u kernels): size=%lu\n", __func__,
+        num_kernels, buffer - start);
 
   if (size)
     *size = (buffer - start);
