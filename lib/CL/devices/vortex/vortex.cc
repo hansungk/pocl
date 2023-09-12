@@ -650,6 +650,7 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
         // the device memory to actually find the addresses (?)
         // NOTE(hansung): why are we storing thes double-pointers?
         memcpy(abuf_ptr + addr, &args_addr, 4);        
+        printf("%s: args_addr=%x\n", __func__, args_addr);
         if (al->value == NULL) {
           memset(abuf_ptr + (args_addr - args_base_addr), 0, 4);
           print_data("*** null=", abuf_ptr + (args_addr - args_base_addr), 4); 
@@ -681,7 +682,12 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
     // upload kernel arguments buffer
     // NOTE(hansung): staging_buf: host --> args_base_addr (0x7fff0000): device
     err = vx_copy_to_dev(staging_buf, args_base_addr, abuf_size, 0);
+    printf("%s: uploading argument buffer to device, device mem address=%x, "
+           "size=%lu bytes\n",
+           __func__, args_base_addr, abuf_size);
     // NOTE(hansung): intercept argument buffer and write into a separate file as well
+    auto staging_buf_hptr = (const char*)vx_host_ptr(staging_buf);
+    assert(0 == pocl_write_file("args.bin", staging_buf_hptr, abuf_size, 0, 0));
     assert(0 == err);
 
     // release staging buffer
@@ -694,6 +700,8 @@ void pocl_vortex_run(void *data, _cl_command_node *cmd) {
        d->current_kernel = kernel;
       char program_bin_path[POCL_FILENAME_LENGTH];
       pocl_cache_final_binary_path (program_bin_path, program, dev_i, kernel, NULL, 0);
+      printf("%s: uploading kernel to device, program_bin_path=%s\n", __func__,
+             program_bin_path);
       err = vx_upload_kernel_file(d->vx_device, program_bin_path);      
       assert(0 == err);
     }
