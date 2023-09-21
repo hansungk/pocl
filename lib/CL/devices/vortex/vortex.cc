@@ -792,7 +792,8 @@ int pocl_llvm_build_vortex_program(cl_kernel kernel,
                                    const char *kernel_bc,
                                    const char *kernel_obj,
                                    char *kernel_out) {
-  char kernel_elf[POCL_FILENAME_LENGTH];
+  // char kernel_elf[POCL_FILENAME_LENGTH];
+  std::string kernel_elf;
   cl_program program = kernel->program;
   int err;
 
@@ -844,9 +845,12 @@ int pocl_llvm_build_vortex_program(cl_kernel kernel,
     if (err != 0)
       return err;
  
-    err = pocl_mk_tempname(kernel_elf, "/tmp/pocl_vortex_kernel", ".elf", nullptr);
-    if (err != 0)
-      return err;
+    // err = pocl_mk_tempname(kernel_elf, "/tmp/pocl_vortex_kernel", ".elf", nullptr);
+    // if (err != 0)
+    //   return err;
+
+    // NOTE(hansung): write ELF file next to the kernel.pocl binary
+    kernel_elf = std::string{basename(kernel_out)} + ".elf";
 
     StaticStrFormat ssfmt(9);
 
